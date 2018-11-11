@@ -15,6 +15,7 @@ class LevelScene extends Phaser.Scene {
 		this.load.image('tile-grass-top-left', 'assets/tile-grass-top-left.png');
 		this.load.image('tile-grass-top-right', 'assets/tile-grass-top-right.png');
 		this.load.image('tile-grass-middle-middle', 'assets/tile-grass-middle-middle.png');
+		this.load.image('tile-grass-top-cap', 'assets/tile-grass-top-cap.png');
 		this.load.json('shapes', 'assets/shapes.json');
 	}
 
@@ -95,6 +96,8 @@ function getTileNameByTypeId(id) {
 			return 'tile-grass-top-left';
 		case 3:
 			return 'tile-grass-top-right';
+		case 4:
+			return 'tile-grass-top-cap';
 	}
 }
 
