@@ -1,5 +1,8 @@
-const tileWidth = 64;
+const TILE_WIDTH = 64;
+
+const JAM_BALL_COUNT = 10;
 
 export {
-	tileWidth
+	TILE_WIDTH,
+	JAM_BALL_COUNT
 };
