@@ -11,7 +11,10 @@ class LevelScene extends Phaser.Scene {
 
 	preload() {
 		this.load.image('jar', 'assets/jar.png');
-		this.load.image('tile-grass-top', 'assets/tile-grass-top.png');
+		this.load.image('tile-grass-top-middle', 'assets/tile-grass-top-middle.png');
+		this.load.image('tile-grass-top-left', 'assets/tile-grass-top-left.png');
+		this.load.image('tile-grass-top-right', 'assets/tile-grass-top-right.png');
+		this.load.image('tile-grass-middle-middle', 'assets/tile-grass-middle-middle.png');
 		this.load.json('shapes', 'assets/shapes.json');
 	}
 
@@ -41,7 +44,8 @@ class LevelScene extends Phaser.Scene {
 			for (let x = 0; x < this.levelData.width; x++) {
 				//TODO check tile type
 				if (this.levelData.tiles[y][x] != -1) {
-					let tile = this.matter.add.sprite(0, 0, 'tile-grass-top', '', {shape: shapes['tile-grass-top']});
+					let tileName = getTileNameByTypeId(this.levelData.tiles[y][x]);
+					let tile = this.matter.add.sprite(0, 0, tileName, '', {shape: shapes[tileName]});
 					tile.setPosition(x*tile.width + tile.centerOfMass.x, y*tile.height + tile.centerOfMass.y);
 				}
 			}
@@ -79,6 +83,19 @@ function getRootBody(body) {
 
 	return body;
 
+}
+
+function getTileNameByTypeId(id) {
+	switch (id) {
+		case 0:
+			return 'tile-grass-middle-middle';
+		case 1:
+			return 'tile-grass-top-middle';
+		case 2:
+			return 'tile-grass-top-left';
+		case 3:
+			return 'tile-grass-top-right';
+	}
 }
 
 export { LevelScene };
