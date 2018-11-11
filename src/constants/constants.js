@@ -1,5 +1,10 @@
-const tileWidth = 64;
+const TILE_WIDTH = 64;
+
+const JAM_BALL_COUNT = 10;
+const LIQUIFY_SPEED = 2;
 
 export {
-	tileWidth
+	TILE_WIDTH,
+	JAM_BALL_COUNT,
+	LIQUIFY_SPEED
 };

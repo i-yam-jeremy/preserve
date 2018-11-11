@@ -1,6 +1,6 @@
 import 'phaser';
 
-import {tileWidth} from '../constants/constants';
+import {TILE_WIDTH, JAM_BALL_COUNT, LIQUIFY_SPEED} from '../constants/constants';
 
 class LevelScene extends Phaser.Scene {
 
@@ -11,6 +11,7 @@ class LevelScene extends Phaser.Scene {
 
 	preload() {
 		this.load.image('jar', 'assets/jar.png');
+		this.load.image('jam-ball', 'assets/jam-ball.png');
 		this.load.image('tile-grass-top-middle', 'assets/tile-grass-top-middle.png');
 		this.load.image('tile-grass-top-left', 'assets/tile-grass-top-left.png');
 		this.load.image('tile-grass-top-right', 'assets/tile-grass-top-right.png');
@@ -22,11 +23,12 @@ class LevelScene extends Phaser.Scene {
 	create() {
 		this.cursors = this.input.keyboard.createCursorKeys();
 
-		let shapes = this.cache.json.get('shapes');
-		this.cameras.main.setBounds(0, 0, tileWidth*this.levelData.width, tileWidth*this.levelData.height);
-		this.matter.world.setBounds(0, 0, tileWidth*this.levelData.width, tileWidth*this.levelData.height);
 
-		this.matter.world.on('collisionstart', (e) => {
+		this.shapes = this.cache.json.get('shapes');
+		this.cameras.main.setBounds(0, 0, TILE_WIDTH*this.levelData.width, TILE_WIDTH*this.levelData.height);
+		this.matter.world.setBounds(0, 0, TILE_WIDTH*this.levelData.width, TILE_WIDTH*this.levelData.height);
+
+		/*this.matter.world.on('collisionstart', (e) => {
 			for (let i = 0; i < e.pairs.length; i++) {
 				let bodyA = getRootBody(e.pairs[i].bodyA);
 				let bodyB = getRootBody(e.pairs[i].bodyB);
@@ -35,44 +37,140 @@ class LevelScene extends Phaser.Scene {
 					//TODO handle collision
 				}
 			}
-		}, this);
+		}, this);*/
 
 		//TODO this.add.image(0, 0, 'background').setOrigin(0, 0);
-		this.jar = this.matter.add.sprite(0, 0, 'jar', '', {shape: shapes.jar});
-		this.jar.setPosition(400 + this.jar.centerOfMass.x, 200 + this.jar.centerOfMass.y);
+
+		let jar = this.matter.add.sprite(0, 0, 'jar', '', {shape: this.shapes.jar});
+		jar.setPosition(400 + jar.centerOfMass.x, 200 + jar.centerOfMass.y);
+		this.jars = [{sprite: jar, balls: JAM_BALL_COUNT}];		
+
+		this.input.keyboard.on('keydown_SPACE', this.toggleLiquify.bind(this), this);
 
 		for (let y = 0; y < this.levelData.height; y++) {
 			for (let x = 0; x < this.levelData.width; x++) {
 				//TODO check tile type
 				if (this.levelData.tiles[y][x] != -1) {
 					let tileName = getTileNameByTypeId(this.levelData.tiles[y][x]);
-					let tile = this.matter.add.sprite(0, 0, tileName, '', {shape: shapes[tileName]});
+					let tile = this.matter.add.sprite(0, 0, tileName, '', {shape: this.shapes[tileName]});
 					tile.setPosition(x*tile.width + tile.centerOfMass.x, y*tile.height + tile.centerOfMass.y);
 				}
 			}
 		}	
-
-		console.log(this);
 	}
 
 	update() {
-		this.cameras.main.centerOn(this.jar.x, this.jar.y);
+		this.centerCamera();
 
-		this.jar.rotation = 0;
-		if (this.cursors.left.isDown) {
-			this.jar.setVelocityX(-4);
+		if (this.jars) {
+			for (let jar of this.jars.map(jar => jar.sprite)) {
+				jar.rotation = 0;
+				if (this.cursors.left.isDown) {
+					jar.setVelocityX(-4);
+				}
+				else if (this.cursors.right.isDown) {
+					jar.setVelocityX(4);
+				}
+				else {
+					jar.setVelocityX(0);
+				}
+
+
+				if (this.cursors.up.isDown && Math.abs(jar.body.velocity.y) < 0.05) { // TODO add check so you ccan't double jump
+					jar.setVelocityY(-12);
+				}
+			}
 		}
-		else if (this.cursors.right.isDown) {
-			this.jar.setVelocityX(4);
+	}
+
+	centerCamera() {
+		let sprites;
+		if (this.jars) {
+			sprites = this.jars.map(jar => jar.sprite);
 		}
 		else {
-			this.jar.setVelocityX(0);
+			sprites = this.liquidBalls;
+		}
+			
+		let x = 0;
+		let y = 0;
+
+		for (let sprite of sprites) {
+			x += sprite.x;
+			y += sprite.y;
 		}
 
+		x /= sprites.length;
+		y /= sprites.length;
 
-		if (this.cursors.up.isDown && Math.abs(this.jar.body.velocity.y) < 0.05) { // TODO add check so you ccan't double jump
-			this.jar.setVelocityY(-12);
+		this.cameras.main.centerOn(x, y);
+	}
+
+	toggleLiquify() {
+		if (this.jars) {
+			console.log(this.jars.map(jar => [jar.sprite.x, jar.sprite.y]));
+			this.liquidBalls = [];
+			for (let jar of this.jars) {
+				for (let i = 0; i < jar.balls; i++) {
+					let ball = this.matter.add.sprite(0, 0, 'jam-ball', '', {shape: this.shapes['jam-ball']});
+					ball.setPosition(jar.sprite.x + ball.centerOfMass.x, jar.sprite.y + ball.centerOfMass.y);
+					ball.setVelocity(LIQUIFY_SPEED*(2*Math.random() - 1), LIQUIFY_SPEED*(2*Math.random() - 1));
+					this.liquidBalls.push(ball);
+				}
+			}
+
+			this.jars.map(jar => jar.sprite.destroy());
+			this.jars = undefined;
 		}
+		else {
+			let clumps = [];
+			for (let ball of this.liquidBalls) {
+				let inClump = false;
+				for (let clump of clumps) {
+					if (inClump) {
+						break;
+					}
+					for (let ball2 of clump) {
+						if (ball != ball2) {
+							let dist = Math.sqrt(Math.pow(ball.x-ball2.x, 2) + Math.pow(ball.y-ball2.y, 2));
+							if (dist < 16+2) {
+								clump.push(ball);
+								inClump = true;
+								break;
+							}
+						}
+					}
+				}
+
+				if (!inClump) {
+					clumps.push([ball]);
+				}
+			}
+		
+			this.jars = [];
+			for (let clump of clumps) {
+				let sumPos = clump.reduce((a, b) => {
+					return {
+						x: a.x+b.x,
+						y: a.y+b.y
+					};
+				});
+				let avgPos = {
+					x: sumPos.x / clump.length,
+					y: sumPos.y / clump.length
+				};
+					
+				let jar = this.matter.add.sprite(0, 0, 'jar', '', {shape: this.shapes.jar});
+				jar.setPosition(avgPos.x, avgPos.y);
+				jar.setScale(Math.sqrt(clump.length / JAM_BALL_COUNT)); // sqrt to scale with area
+				this.jars.push({sprite: jar, balls: clump.length});
+			}
+
+
+			this.liquidBalls.map(ball => ball.destroy());
+			this.liquidBalls = undefined;
+		}
+
 	}
 
 }
