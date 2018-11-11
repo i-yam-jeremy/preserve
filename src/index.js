@@ -21,21 +21,39 @@ let config = {
 let game = new Phaser.Game(config);
 
 function preload() {
-	this.load.image('jam-jar', 'assets/jam-jar.png');
-	this.load.json('jam-jar-shape', 'assets/jam-jar-shape.json');
+	this.load.image('jar', 'assets/jar.png');
+	this.load.json('jar-shape', 'assets/jar-shape.json');
 }
 
+let jar;
+let cursors;
 function create() {
-	let jarShape = this.cache.json.get('jam-jar-shape');
+	cursors = this.input.keyboard.createCursorKeys();
+
+	let jarShape = this.cache.json.get('jar-shape');
 	this.matter.world.setBounds(0, 0, game.config.width, game.config.height);
 	//TODO this.add.image(0, 0, 'background').setOrigin(0, 0);
-	let jar = this.matter.add.sprite(0, 0, 'jam-jar', {shape: jarShape['jam-jar']});
-	jar.setPosition(400 + jar.centerOfMass.x, 300 + jar.centerOfMass.y);
-	jar.scaleX = jar.scaleY = 2.0;
-	let jar2 = this.matter.add.sprite(0, 0, 'jam-jar', {shape: jarShape['jam-jar']});
-	jar2.setPosition(410 + jar2.centerOfMass.x, 325 + jar2.centerOfMass.y);
+	console.log(jarShape.jar);
+	jar = this.matter.add.sprite(0, 0, 'jar', {shape: jarShape.jar});
+	console.log(jar.body);
+	jar.setPosition(400 + jar.centerOfMass.x, 200 + jar.centerOfMass.y);
+	let jar2 = this.matter.add.sprite(0, 0, 'jar', {shape: jarShape.jar});
+	jar2.setPosition(500 + jar2.centerOfMass.x, 325 + jar2.centerOfMass.y);
 }
 
 function update() {
+	jar.rotation = 0;
+	if (cursors.left.isDown) {
+		jar.setVelocityX(-4);
+	}
+	else if (cursors.right.isDown) {
+		jar.setVelocityX(4);
+	}
+	else {
+		jar.setVelocityX(0);
+	}
 
+	if (cursors.up.isDown && Math.abs(jar.body.velocity.y) < 0.05) { // TODO add check so you ccan't double jump
+		jar.setVelocityY(-12);
+	}
 }
