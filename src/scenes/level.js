@@ -1,6 +1,6 @@
 import 'phaser';
 
-import {TILE_WIDTH, JAM_BALL_COUNT} from '../constants/constants';
+import {TILE_WIDTH, JAM_BALL_COUNT, LIQUIFY_SPEED} from '../constants/constants';
 
 class LevelScene extends Phaser.Scene {
 
@@ -107,15 +107,14 @@ class LevelScene extends Phaser.Scene {
 	}
 
 	toggleLiquify() {
-		console.log(this.jars);
 		if (this.jars) {
+			console.log(this.jars.map(jar => [jar.sprite.x, jar.sprite.y]));
 			this.liquidBalls = [];
 			for (let jar of this.jars) {
-				console.log("Jar: ", jar);
 				for (let i = 0; i < jar.balls; i++) {
 					let ball = this.matter.add.sprite(0, 0, 'jam-ball', '', {shape: this.shapes['jam-ball']});
 					ball.setPosition(jar.sprite.x + ball.centerOfMass.x, jar.sprite.y + ball.centerOfMass.y);
-					//ball.setVelocity(jar.sprite.velocity.x, jar.sprite.velocity.y);
+					ball.setVelocity(LIQUIFY_SPEED*(2*Math.random() - 1), LIQUIFY_SPEED*(2*Math.random() - 1));
 					this.liquidBalls.push(ball);
 				}
 			}
@@ -128,12 +127,16 @@ class LevelScene extends Phaser.Scene {
 			for (let ball of this.liquidBalls) {
 				let inClump = false;
 				for (let clump of clumps) {
+					if (inClump) {
+						break;
+					}
 					for (let ball2 of clump) {
 						if (ball != ball2) {
 							let dist = Math.sqrt(Math.pow(ball.x-ball2.x, 2) + Math.pow(ball.y-ball2.y, 2));
 							if (dist < 16+2) {
 								clump.push(ball);
 								inClump = true;
+								break;
 							}
 						}
 					}
@@ -158,9 +161,8 @@ class LevelScene extends Phaser.Scene {
 				};
 					
 				let jar = this.matter.add.sprite(0, 0, 'jar', '', {shape: this.shapes.jar});
-				jar.setPosition(avgPos.x + jar.centerOfMass.x, avgPos.y + jar.centerOfMass.y);
+				jar.setPosition(avgPos.x, avgPos.y);
 				jar.setScale(Math.sqrt(clump.length / JAM_BALL_COUNT)); // sqrt to scale with area
-				console.log(jar);
 				this.jars.push({sprite: jar, balls: clump.length});
 			}
 
