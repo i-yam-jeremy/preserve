@@ -24,9 +24,9 @@
 			}
 		]
 	},
-	"tile-grass-top": {
+	"tile-grass-middle-middle": {
 		"type": "fromPhysicsEditor",
-		"label": "tile-grass-top",
+		"label": "tile-grass-middle-middle",
 		"isStatic": true,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -43,7 +43,103 @@
 				"label": "",
 				"isSensor": false,
 				"vertices": [
-					[ { "x":64, "y":64 }, { "x":64, "y":0 }, { "x":0, "y":0 }, { "x":0, "y":64 } ]
+					[ { "x":0, "y":0 }, { "x":0, "y":64 }, { "x":64, "y":64 }, { "x":64, "y":0 } ]
+				]
+			}
+		]
+	},
+	"tile-grass-top-left": {
+		"type": "fromPhysicsEditor",
+		"label": "tile-grass-top-left",
+		"isStatic": true,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":64, "y":64 }, { "x":64, "y":0 }, { "x":7, "y":0 }, { "x":0, "y":9 }, { "x":0, "y":64 } ]
+				]
+			}
+		]
+	},
+	"tile-grass-top-right": {
+		"type": "fromPhysicsEditor",
+		"label": "tile-grass-top-right",
+		"isStatic": true,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":0, "y":64 }, { "x":64, "y":64 }, { "x":64, "y":9 }, { "x":57, "y":0 }, { "x":0, "y":0 } ]
+				]
+			}
+		]
+	},
+	"tile-grass-top-middle": {
+		"type": "fromPhysicsEditor",
+		"label": "tile-grass-top-middle",
+		"isStatic": true,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":0, "y":0 }, { "x":0, "y":64 }, { "x":64, "y":64 }, { "x":64, "y":0 } ]
+				]
+			}
+		]
+	},
+	"tile-grass-top-cap": {
+		"type": "fromPhysicsEditor",
+		"label": "tile-grass-top-cap",
+		"isStatic": true,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":64, "y":64 }, { "x":64, "y":9 }, { "x":58, "y":0 }, { "x":7, "y":0 }, { "x":0, "y":9 }, { "x":0, "y":64 } ]
 				]
 			}
 		]
