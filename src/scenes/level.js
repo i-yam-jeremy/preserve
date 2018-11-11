@@ -35,16 +35,36 @@ class LevelScene extends Phaser.Scene {
 		this.cameras.main.setBounds(0, 0, TILE_WIDTH*this.levelData.width, TILE_WIDTH*this.levelData.height);
 		this.matter.world.setBounds(0, 0, TILE_WIDTH*this.levelData.width, TILE_WIDTH*this.levelData.height);
 
-		/*this.matter.world.on('collisionstart', (e) => {
+
+		this.matter.world.on('collisionstart', (e) => {
 			for (let i = 0; i < e.pairs.length; i++) {
 				let bodyA = getRootBody(e.pairs[i].bodyA);
 				let bodyB = getRootBody(e.pairs[i].bodyB);
-				if (bodyA.label == 'jar' || bodyB.label == 'jar') {
-					console.log(bodyA.label == 'jar' ? bodyB : bodyA);
-					//TODO handle collision
+		
+				if (this.jars) {
+					for (let jar of this.jars) {
+						if (jar.sprite.body == bodyA || jar.sprite.body == bodyB) {
+							jar.onGround = true;
+						}
+					}
 				}
 			}
-		}, this);*/
+		});
+		
+		this.matter.world.on('collisionend', (e) => {
+			for (let i = 0; i < e.pairs.length; i++) {
+				let bodyA = getRootBody(e.pairs[i].bodyA);
+				let bodyB = getRootBody(e.pairs[i].bodyB);
+	
+				if (this.jars) {
+					for (let jar of this.jars) {
+						if (jar.sprite.body == bodyA || jar.sprite.body == bodyB) {
+							jar.onGround = false;
+						}
+					}
+				}
+			}
+		});
 
 
 		this.input.keyboard.on('keydown_SPACE', this.toggleLiquify.bind(this), this);
@@ -69,21 +89,22 @@ class LevelScene extends Phaser.Scene {
 		this.centerCamera();
 
 		if (this.jars) {
-			for (let jar of this.jars.map(jar => jar.sprite)) {
-				jar.rotation = 0;
+			for (let jar of this.jars) {
+				let sprite = jar.sprite;
+				sprite.rotation = 0;
 				if (this.cursors.left.isDown) {
-					jar.setVelocityX(-4);
+					sprite.setVelocityX(-4);
 				}
 				else if (this.cursors.right.isDown) {
-					jar.setVelocityX(4);
+					sprite.setVelocityX(4);
 				}
 				else {
-					jar.setVelocityX(0);
+					sprite.setVelocityX(0);
 				}
 
 
-				if (this.cursors.up.isDown && Math.abs(jar.body.velocity.y) < 0.05) { // TODO add check so you ccan't double jump
-					jar.setVelocityY(-12);
+				if (this.cursors.up.isDown && jar.onGround) {
+					sprite.setVelocityY(-12);
 				}
 			}
 		}
