@@ -10,6 +10,7 @@ class LevelScene extends Phaser.Scene {
 	}
 
 	preload() {
+		this.load.image('background-tile', 'assets/background-tile.png');
 		this.load.image('jar', 'assets/jar.png');
 		this.load.image('jam-ball', 'assets/jam-ball.png');
 		this.load.image('tile-grass-top-middle', 'assets/tile-grass-top-middle.png');
@@ -39,24 +40,23 @@ class LevelScene extends Phaser.Scene {
 			}
 		}, this);*/
 
-		//TODO this.add.image(0, 0, 'background').setOrigin(0, 0);
-
-		let jar = this.matter.add.sprite(0, 0, 'jar', '', {shape: this.shapes.jar});
-		jar.setPosition(400 + jar.centerOfMass.x, 200 + jar.centerOfMass.y);
-		this.jars = [{sprite: jar, balls: JAM_BALL_COUNT}];		
 
 		this.input.keyboard.on('keydown_SPACE', this.toggleLiquify.bind(this), this);
 
 		for (let y = 0; y < this.levelData.height; y++) {
 			for (let x = 0; x < this.levelData.width; x++) {
-				//TODO check tile type
+				this.add.image(x*TILE_WIDTH, y*TILE_WIDTH, 'background-tile').setOrigin(0, 0);
 				if (this.levelData.tiles[y][x] != -1) {
 					let tileName = getTileNameByTypeId(this.levelData.tiles[y][x]);
 					let tile = this.matter.add.sprite(0, 0, tileName, '', {shape: this.shapes[tileName]});
 					tile.setPosition(x*tile.width + tile.centerOfMass.x, y*tile.height + tile.centerOfMass.y);
 				}
 			}
-		}	
+		}
+		
+		let jar = this.matter.add.sprite(0, 0, 'jar', '', {shape: this.shapes.jar});
+		jar.setPosition(400 + jar.centerOfMass.x, 200 + jar.centerOfMass.y);
+		this.jars = [{sprite: jar, balls: JAM_BALL_COUNT}];		
 	}
 
 	update() {
