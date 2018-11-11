@@ -1,8 +1,10 @@
+import {tileWidth} from '../constants/constants';
+
 const config = {
 	type: Phaser.AUTO,
 	parent: 'preserve',
-	width: 13*64,
-	height: 10*64,
+	width: 13*tileWidth,
+	height: 10*tileWidth,
 	physics: {
 		default: 'matter',
 		matter: {
