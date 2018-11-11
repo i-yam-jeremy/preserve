@@ -159,7 +159,8 @@ class LevelScene extends Phaser.Scene {
 					
 				let jar = this.matter.add.sprite(0, 0, 'jar', '', {shape: this.shapes.jar});
 				jar.setPosition(avgPos.x + jar.centerOfMass.x, avgPos.y + jar.centerOfMass.y);
-				jar.body.scaleX = jar.body.scaleY = clump.length / JAM_BALL_COUNT;
+				jar.setScale(Math.sqrt(clump.length / JAM_BALL_COUNT)); // sqrt to scale with area
+				console.log(jar);
 				this.jars.push({sprite: jar, balls: clump.length});
 			}
 
