@@ -18,6 +18,12 @@ class LevelScene extends Phaser.Scene {
 		this.load.image('tile-grass-top-right', 'assets/tile-grass-top-right.png');
 		this.load.image('tile-grass-middle-middle', 'assets/tile-grass-middle-middle.png');
 		this.load.image('tile-grass-top-cap', 'assets/tile-grass-top-cap.png');
+		this.load.image('tile-grass-slope-right-start', 'assets/tile-grass-slope-right-start.png');
+		this.load.image('tile-grass-slope-right', 'assets/tile-grass-slope-right.png');
+		this.load.image('tile-grass-slope-right-connective', 'assets/tile-grass-slope-right-connective.png');
+		this.load.image('tile-grass-slope-left-start', 'assets/tile-grass-slope-left-start.png');
+		this.load.image('tile-grass-slope-left', 'assets/tile-grass-slope-left.png');
+		this.load.image('tile-grass-slope-left-connective', 'assets/tile-grass-slope-left-connective.png');
 		this.load.json('shapes', 'assets/shapes.json');
 	}
 
@@ -108,13 +114,15 @@ class LevelScene extends Phaser.Scene {
 
 	toggleLiquify() {
 		if (this.jars) {
-			console.log(this.jars.map(jar => [jar.sprite.x, jar.sprite.y]));
+			console.log(this.jars[0].sprite.body.velocity);
 			this.liquidBalls = [];
 			for (let jar of this.jars) {
 				for (let i = 0; i < jar.balls; i++) {
 					let ball = this.matter.add.sprite(0, 0, 'jam-ball', '', {shape: this.shapes['jam-ball']});
 					ball.setPosition(jar.sprite.x + ball.centerOfMass.x, jar.sprite.y + ball.centerOfMass.y);
-					ball.setVelocity(LIQUIFY_SPEED*(2*Math.random() - 1), LIQUIFY_SPEED*(2*Math.random() - 1));
+					ball.setVelocity(
+						jar.sprite.body.velocity.x + LIQUIFY_SPEED*(2*Math.random() - 1),
+						jar.sprite.body.velocity.y + LIQUIFY_SPEED*(2*Math.random() - 1));
 					this.liquidBalls.push(ball);
 				}
 			}
@@ -196,6 +204,18 @@ function getTileNameByTypeId(id) {
 			return 'tile-grass-top-right';
 		case 4:
 			return 'tile-grass-top-cap';
+		case 5:
+			return 'tile-grass-slope-left-start';
+		case 6:
+			return 'tile-grass-slope-left';
+		case 7:
+			return 'tile-grass-slope-left-connective';
+		case 8:
+			return 'tile-grass-slope-right-start';
+		case 9:
+			return 'tile-grass-slope-right';
+		case 10:
+			return 'tile-grass-slope-right-connective';
 	}
 }
 
