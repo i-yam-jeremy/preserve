@@ -143,5 +143,31 @@
 				]
 			}
 		]
+	},
+	"jam-ball": {
+		"type": "fromPhysicsEditor",
+		"label": "jam-ball",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"circle": {
+					"x": 8,
+					"y": 7.799999999999999,
+					"radius": 7.863841300534997
+				}
+			}
+		]
 	}
 }
