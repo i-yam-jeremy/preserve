@@ -2,8 +2,9 @@ import 'phaser';
 
 class LevelScene extends Phaser.Scene {
 
-	constructor() { // TODO add level data parameter
-		super('Level');
+	constructor(levelData) {
+		super(levelData.name);
+		this.levelData = levelData;
 	}
 
 	preload() {
@@ -20,12 +21,16 @@ class LevelScene extends Phaser.Scene {
 		//TODO this.add.image(0, 0, 'background').setOrigin(0, 0);
 		this.jar = this.matter.add.sprite(0, 0, 'jar', '', {shape: shapes.jar});
 		this.jar.setPosition(400 + this.jar.centerOfMass.x, 200 + this.jar.centerOfMass.y);
-		let jar2 = this.matter.add.sprite(0, 0, 'jar', '', {shape: shapes.jar});
-		jar2.setPosition(500 + jar2.centerOfMass.x, 325 + jar2.centerOfMass.y);
 
-		let tile = this.matter.add.sprite(0, 0, 'tile-grass-top', '', {shape: shapes['tile-grass-top']});
-		tile.setPosition(0 + tile.centerOfMass.x, 600 - tile.centerOfMass.y);
-
+		for (let y = 0; y < this.levelData.height; y++) {
+			for (let x = 0; x < this.levelData.width; x++) {
+				//TODO check tile type
+				if (this.levelData.tiles[y][x] != -1) {
+					let tile = this.matter.add.sprite(0, 0, 'tile-grass-top', '', {shape: shapes['tile-grass-top']});
+					tile.setPosition(x*tile.width + tile.centerOfMass.x, y*tile.height + tile.centerOfMass.y);
+				}
+			}
+		}	
 	}
 
 	update() {
