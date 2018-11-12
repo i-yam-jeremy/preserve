@@ -68,8 +68,6 @@ class LevelScene extends Phaser.Scene {
 
 					if (this.jamletsFinished >= this.levelData.jamletsNeeded) {
 						this.unlockNextLevel();
-						this.scene.switch('level-select');
-						this.scene.remove('level');
 					}
 				}
 
@@ -347,7 +345,8 @@ class LevelScene extends Phaser.Scene {
 	unlockNextLevel() {
 		if (this.level == LEVEL_COUNT) {
 			if (this.levelMode == 'hard') {
-				//TODO add game win screen
+				this.scene.switch('game-complete');
+				this.scene.remove('level');
 			}
 			else {
 				let newMode = getNextMode(this.levelMode);
@@ -359,6 +358,8 @@ class LevelScene extends Phaser.Scene {
 			this.levelsUnlocked[this.levelMode][index+1] = true;
 		}
 		this.levelsUnlocked.needsToRefreshLocks = true;
+		this.scene.switch('level-select');
+		this.scene.remove('level');
 	}
 
 	releaseButton(button) {
