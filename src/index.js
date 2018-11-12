@@ -15,9 +15,9 @@ class Game extends Phaser.Game {
 		super(config);
 		
 		let levelsUnlocked = {
-			'easy': Array.apply(null, Array(LEVEL_COUNT)).map(x => false),
-			'medium': Array.apply(null, Array(LEVEL_COUNT)).map(x => false),
-			'hard': Array.apply(null, Array(LEVEL_COUNT)).map(x => false),
+			'easy': Array.apply(null, Array(LEVEL_COUNT)).map(x => true), //FIXME turn levels back to locked
+			'medium': Array.apply(null, Array(LEVEL_COUNT)).map(x => true),
+			'hard': Array.apply(null, Array(LEVEL_COUNT)).map(x => true),
 			needsToRefreshLocks: false
 		};
 		levelsUnlocked['easy'][0] = true; // first level must be unlocked
