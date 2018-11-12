@@ -27,6 +27,9 @@ class LevelScene extends Phaser.Scene {
 		this.load.image('tile-button-up', 'assets/tile-button-up.png');
 		this.load.image('tile-button-down', 'assets/tile-button-down.png');
 		this.load.image('tile-gate', 'assets/tile-gate.png');
+
+		this.load.audio('gate', ['assets/gate.mp3']);
+
 		this.load.json('shapes', 'assets/shapes.json');
 	}
 
@@ -57,6 +60,9 @@ class LevelScene extends Phaser.Scene {
 								let tileX = (body.gameObject.x - body.gameObject.centerOfMass.x) / TILE_WIDTH;
 								let tileY = (body.gameObject.y - body.gameObject.centerOfMass.y) / TILE_WIDTH;
 								body.gameObject.destroy();
+								
+								let gateSound = this.sound.add('gate');
+								gateSound.play();
 							
 								this.levelData.buttonHandler(this, tileX, tileY, 'down');
 							}
@@ -84,6 +90,8 @@ class LevelScene extends Phaser.Scene {
 								let tileY = (body.gameObject.y - body.gameObject.centerOfMass.y) / TILE_WIDTH;
 								body.gameObject.destroy();
 
+								let gateSound = this.sound.add('gate');
+								gateSound.play();
 								this.levelData.buttonHandler(this, tileX, tileY, 'up');
 							}	
 						}
