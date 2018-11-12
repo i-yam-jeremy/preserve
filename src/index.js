@@ -1,6 +1,7 @@
 import 'phaser';
 import {config} from './config/config';
 import {LevelScene} from './scenes/level';
+import {MainMenuScene} from './scenes/main-menu';
 
 
 class Game extends Phaser.Game {
@@ -38,7 +39,8 @@ class Game extends Phaser.Game {
 			}
 		};
 		this.scene.add('', new LevelScene(levelData));
-		this.scene.start('level-1');
+		this.scene.add('', new MainMenuScene());
+		this.scene.start('main-menu');
 	}
 
 }
