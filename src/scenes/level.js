@@ -1,13 +1,16 @@
 import 'phaser';
 
-import {TILE_WIDTH, JAM_BALL_COUNT, LIQUIFY_SPEED} from '../constants/constants';
+import {TILE_WIDTH, JAM_BALL_COUNT, LIQUIFY_SPEED, LEVEL_COUNT} from '../constants/constants';
 
 class LevelScene extends Phaser.Scene {
 
-	constructor(levelData) {
+	constructor(levelMode, level, levelData, levelsUnlocked) {
 		super(levelData.name);
 		this.levelData = levelData;
 		this.jamletsFinished = 0;
+		this.levelMode = levelMode;
+		this.level = level;
+		this.levelsUnlocked = levelsUnlocked;
 	}
 
 	preload() {
@@ -61,8 +64,8 @@ class LevelScene extends Phaser.Scene {
 					this.jamletsLabel.setText("Jamlets: " + this.jamletsFinished + "/" + this.levelData.jamletsNeeded)
 
 					if (this.jamletsFinished >= this.levelData.jamletsNeeded) {
-						// TODO finish level
-						alert('You finished');
+						this.unlockNextLevel();
+						this.scene.switch('level-select');
 					}
 				}
 	
@@ -154,7 +157,6 @@ class LevelScene extends Phaser.Scene {
 			color: '#FFC200',
 			backgroundColor: '#8899AA'
 		});
-		console.log(this.jamletsLabel);
 	}
 
 	update() {
@@ -294,6 +296,32 @@ class LevelScene extends Phaser.Scene {
 		}
 	}
 
+	unlockNextLevel() {
+		if (this.level == LEVEL_COUNT) {
+			if (this.levelMode == 'hard') {
+				//TODO add game win screen
+			}
+			else {
+				let newMode = getNextMode(this.levelMode);
+				this.levelsUnlocked[newMode][0] = true;
+			}
+		}
+		else {
+			let index = this.level-1;
+			this.levelsUnlocked[this.levelMode][index+1] = true;
+		}
+		this.levelsUnlocked.needsToRefreshLocks = true;
+	}
+
+}
+
+function getNextMode(mode) {
+	if (mode == 'easy') {
+		return 'medium';
+	}
+	else if (mode == 'medium') {
+		return 'hard';
+	}
 }
 
 function getRootBody(body) {

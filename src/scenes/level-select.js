@@ -150,6 +150,13 @@ class LevelSelectScene extends Phaser.Scene {
 
 	}
 
+	update() {
+		if (this.levelsUnlocked.needsToRefreshLocks) {
+			this.levelsUnlocked.needsToRefreshLocks = false;
+			this.changeMode(this.levelMode); // refresh locks
+		}
+	}
+
 	changeMode(newMode) {
 		this.levelMode = newMode;
 		this.modeLabel.destroy();
