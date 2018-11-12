@@ -31,7 +31,6 @@ function contains(p, sprite) {
 		p.x < sprite.x + sprite.width/2 &&
 		p.y > sprite.y - sprite.height/2 &&
 		p.y < sprite.y + sprite.height/2;
-
 }
 
 class LevelSelectScene extends Phaser.Scene {

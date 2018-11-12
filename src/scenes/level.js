@@ -32,6 +32,7 @@ class LevelScene extends Phaser.Scene {
 		this.load.image('tile-button-down', 'assets/tile-button-down.png');
 		this.load.image('tile-gate', 'assets/tile-gate.png');
 		this.load.image('tile-finish', 'assets/tile-finish.png');
+		this.load.image('back-to-level-select', 'assets/back-to-level-select.png');
 
 		this.load.audio('gate', ['assets/gate.mp3']);
 
@@ -46,7 +47,6 @@ class LevelScene extends Phaser.Scene {
 		this.shapes = this.cache.json.get('shapes');
 		this.cameras.main.setBounds(0, 0, TILE_WIDTH*this.levelData.width, TILE_WIDTH*this.levelData.height);
 		this.matter.world.setBounds(0, 0, TILE_WIDTH*this.levelData.width, TILE_WIDTH*this.levelData.height);
-
 
 		this.matter.world.on('collisionstart', (e) => {
 			for (let i = 0; i < e.pairs.length; i++) {
@@ -157,11 +157,32 @@ class LevelScene extends Phaser.Scene {
 			color: '#FFC200',
 			backgroundColor: '#8899AA'
 		});
+		
+		this.backButton = this.add.image(0, 0, 'back-to-level-select');
+		this.backButton.setPosition(this.backButton.width/2, this.cameras.main.displayHeight - this.backButton.height/2);
+
+		this.input.on('pointermove', (p) => {
+			if (contains(p, this.backButton)) {
+				this.backButton.setTint(0xAAAAAA);	
+			}
+			else {
+				this.backButton.setTint(0xFFFFFF);
+			}
+		}, this);
+		
+		this.input.on('pointerdown', (p) => {
+			if (contains(p, this.backButton)) {
+				this.backButton.setTint(0xFFFFFF);
+				this.scene.switch('level-select');
+			}
+		}, this);
 	}
 
 	update() {
 		this.centerCamera();
 		this.jamletsLabel.setPosition(this.cameras.main.scrollX, this.cameras.main.scrollY);
+		this.backButton.setPosition(this.cameras.main.scrollX + this.backButton.width/2,
+			this.cameras.main.scrollY + this.cameras.main.displayHeight - this.backButton.height/2);
 
 		if (this.jars) {
 			for (let jar of this.jars) {
@@ -332,6 +353,14 @@ function getRootBody(body) {
 	return body;
 
 }
+
+function contains(p, sprite) {
+	return p.x > sprite.x - sprite.width/2 &&
+		p.x < sprite.x + sprite.width/2 &&
+		p.y > sprite.y - sprite.height/2 &&
+		p.y < sprite.y + sprite.height/2;
+}
+
 
 function getTileNameByTypeId(id) {
 	switch (id) {
