@@ -26,6 +26,7 @@ class LevelScene extends Phaser.Scene {
 		this.load.image('tile-grass-slope-left-connective', 'assets/tile-grass-slope-left-connective.png');
 		this.load.image('tile-button-up', 'assets/tile-button-up.png');
 		this.load.image('tile-button-down', 'assets/tile-button-down.png');
+		this.load.image('tile-gate', 'assets/tile-gate.png');
 		this.load.json('shapes', 'assets/shapes.json');
 	}
 
@@ -52,8 +53,12 @@ class LevelScene extends Phaser.Scene {
 								let tileName = 'tile-button-down';
 								let tile = this.matter.add.sprite(0, 0, tileName, '', {shape: this.shapes[tileName]});
 								tile.setPosition(body.gameObject.x, body.gameObject.y - body.gameObject.centerOfMass.y + tile.centerOfMass.y);
+								
+								let tileX = (body.gameObject.x - body.gameObject.centerOfMass.x) / TILE_WIDTH;
+								let tileY = (body.gameObject.y - body.gameObject.centerOfMass.y) / TILE_WIDTH;
 								body.gameObject.destroy();
-								//TODO fire button down event
+							
+								this.levelData.buttonHandler(this, tileX, tileY, 'down');
 							}
 						}
 					}
@@ -72,12 +77,14 @@ class LevelScene extends Phaser.Scene {
 							jar.onGround = false;
 							let body = jar.sprite.body == bodyA ? bodyB : bodyA;
 							if (body.label == 'tile-button-down') {
-								setTimeout(() => {let tileName = 'tile-button-up';
+								let tileName = 'tile-button-up';
 								let tile = this.matter.add.sprite(0, 0, tileName, '', {shape: this.shapes[tileName]});
 								tile.setPosition(body.gameObject.x, body.gameObject.y - body.gameObject.centerOfMass.y + tile.centerOfMass.y);
+								let tileX = (body.gameObject.x - body.gameObject.centerOfMass.x) / TILE_WIDTH;
+								let tileY = (body.gameObject.y - body.gameObject.centerOfMass.y) / TILE_WIDTH;
 								body.gameObject.destroy();
-								//TODO fire button down event
-								}, 100);
+
+								this.levelData.buttonHandler(this, tileX, tileY, 'up');
 							}	
 						}
 					}
@@ -88,13 +95,19 @@ class LevelScene extends Phaser.Scene {
 
 		this.input.keyboard.on('keydown_SPACE', this.toggleLiquify.bind(this), this);
 
+		this.gates = [];
 		for (let y = 0; y < this.levelData.height; y++) {
 			for (let x = 0; x < this.levelData.width; x++) {
 				this.add.image(x*TILE_WIDTH, y*TILE_WIDTH, 'background-tile').setOrigin(0, 0);
 				if (this.levelData.tiles[y][x] != -1) {
 					let tileName = getTileNameByTypeId(this.levelData.tiles[y][x]);
+
 					let tile = this.matter.add.sprite(0, 0, tileName, '', {shape: this.shapes[tileName]});
-					tile.setPosition(x*tile.width + tile.centerOfMass.x, y*tile.height + tile.centerOfMass.y);
+					tile.setPosition(x*TILE_WIDTH + tile.centerOfMass.x, y*TILE_WIDTH + tile.centerOfMass.y);
+				
+					if (tileName == 'tile-gate') {
+						this.gates.push({x: x, y: y, sprite: tile});
+					}
 				}
 			}
 		}
@@ -221,6 +234,26 @@ class LevelScene extends Phaser.Scene {
 
 	}
 
+	openGate(tileX, tileY) {
+		for (let gate of this.gates) {
+			if (gate.x == tileX && gate.y == tileY) {
+				gate.sprite.destroy();
+				gate.sprite = undefined;
+			}
+		}
+	}
+	
+	closeGate(tileX, tileY) {
+		for (let gate of this.gates) {
+			if (gate.x == tileX && gate.y == tileY && gate.sprite == undefined) {
+				let tileName = 'tile-gate';
+				let tile = this.matter.add.sprite(0, 0, tileName, '', {shape: this.shapes[tileName]});
+				tile.setPosition(gate.x*TILE_WIDTH + tile.centerOfMass.x, gate.y*TILE_WIDTH + tile.centerOfMass.y);
+				gate.sprite = tile;
+			}
+		}
+	}
+
 }
 
 function getRootBody(body) {
@@ -258,6 +291,8 @@ function getTileNameByTypeId(id) {
 			return 'tile-grass-slope-right-connective';
 		case 11:
 			return 'tile-button-up';
+		case 12:
+			return 'tile-gate';
 	}
 }
 
