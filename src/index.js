@@ -43,7 +43,7 @@ class Game extends Phaser.Game {
 		this.scene.add('', new HowToScene());
 		this.scene.add('', new LevelSelectScene());
 		this.scene.add('', new MainMenuScene());
-		this.scene.start('main-menu');
+		this.scene.start('level-select');
 	}
 
 }
