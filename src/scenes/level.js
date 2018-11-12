@@ -24,6 +24,8 @@ class LevelScene extends Phaser.Scene {
 		this.load.image('tile-grass-slope-left-start', 'assets/tile-grass-slope-left-start.png');
 		this.load.image('tile-grass-slope-left', 'assets/tile-grass-slope-left.png');
 		this.load.image('tile-grass-slope-left-connective', 'assets/tile-grass-slope-left-connective.png');
+		this.load.image('tile-button-up', 'assets/tile-button-up.png');
+		this.load.image('tile-button-down', 'assets/tile-button-down.png');
 		this.load.json('shapes', 'assets/shapes.json');
 	}
 
@@ -45,6 +47,14 @@ class LevelScene extends Phaser.Scene {
 					for (let jar of this.jars) {
 						if (jar.sprite.body == bodyA || jar.sprite.body == bodyB) {
 							jar.onGround = true;
+							let body = jar.sprite.body == bodyA ? bodyB : bodyA;
+							if (body.label == 'tile-button-up') {
+								let tileName = 'tile-button-down';
+								let tile = this.matter.add.sprite(0, 0, tileName, '', {shape: this.shapes[tileName]});
+								tile.setPosition(body.gameObject.x, body.gameObject.y - body.gameObject.centerOfMass.y + tile.centerOfMass.y);
+								body.gameObject.destroy();
+								//TODO fire button down event
+							}
 						}
 					}
 				}
@@ -60,6 +70,15 @@ class LevelScene extends Phaser.Scene {
 					for (let jar of this.jars) {
 						if (jar.sprite.body == bodyA || jar.sprite.body == bodyB) {
 							jar.onGround = false;
+							let body = jar.sprite.body == bodyA ? bodyB : bodyA;
+							if (body.label == 'tile-button-down') {
+								setTimeout(() => {let tileName = 'tile-button-up';
+								let tile = this.matter.add.sprite(0, 0, tileName, '', {shape: this.shapes[tileName]});
+								tile.setPosition(body.gameObject.x, body.gameObject.y - body.gameObject.centerOfMass.y + tile.centerOfMass.y);
+								body.gameObject.destroy();
+								//TODO fire button down event
+								}, 100);
+							}	
 						}
 					}
 				}
@@ -82,7 +101,7 @@ class LevelScene extends Phaser.Scene {
 		
 		let jar = this.matter.add.sprite(0, 0, 'jar', '', {shape: this.shapes.jar});
 		jar.setPosition(400 + jar.centerOfMass.x, 200 + jar.centerOfMass.y);
-		this.jars = [{sprite: jar, balls: JAM_BALL_COUNT}];		
+		this.jars = [{sprite: jar, balls: JAM_BALL_COUNT}];
 	}
 
 	update() {
@@ -237,6 +256,8 @@ function getTileNameByTypeId(id) {
 			return 'tile-grass-slope-right';
 		case 10:
 			return 'tile-grass-slope-right-connective';
+		case 11:
+			return 'tile-button-up';
 	}
 }
 
