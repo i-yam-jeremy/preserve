@@ -104,7 +104,7 @@ class LevelScene extends Phaser.Scene {
 						dist -= Math.sqrt(Math.pow(jar.sprite.width/2, 2) + Math.pow(jar.sprite.height/2, 2));
 						dist -= Math.sqrt(Math.pow(button.width/2, 2) + Math.pow(button.height/2, 2));
 
-						if (dist < 2) {
+						if (dist < 1) {
 							closeJar = true;
 							break;
 						}
