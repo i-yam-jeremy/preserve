@@ -36,6 +36,7 @@ class LevelScene extends Phaser.Scene {
 		this.load.image('tile-grass-pipe-vertical', 'assets/tile-grass-pipe-vertical.png');
 		this.load.image('tile-grass-pipe-horizontal-narrow', 'assets/tile-grass-pipe-horizontal-narrow.png');
 		this.load.image('tile-grass-pipe-vertical-narrow', 'assets/tile-grass-pipe-vertical-narrow.png');
+		this.load.image('tile-spikes', 'assets/tile-spikes.png');
 		this.load.image('back-to-level-select', 'assets/back-to-level-select.png');
 
 		this.load.json('shapes', 'assets/shapes.json');
@@ -71,6 +72,18 @@ class LevelScene extends Phaser.Scene {
 						this.scene.remove('level');
 					}
 				}
+
+				if (bodyLabels.indexOf('jamlet') != -1 && bodyLabels.indexOf('tile-spikes') != -1) {
+					let jamletBody = bodyA.label == 'jamlet' ? bodyA : bodyB;
+					let index = this.liquidBalls.indexOf(jamletBody.gameObject);
+					this.liquidBalls.splice(index, 1);
+					jamletBody.gameObject.destroy();
+
+					if (this.liquidBalls.length == 0) {
+						this.scene.switch('level-select');
+						this.scene.remove('level');
+					}
+				}
 	
 				if (this.jars) {
 					for (let jar of this.jars) {
@@ -91,7 +104,7 @@ class LevelScene extends Phaser.Scene {
 						dist -= Math.sqrt(Math.pow(jar.sprite.width/2, 2) + Math.pow(jar.sprite.height/2, 2));
 						dist -= Math.sqrt(Math.pow(button.width/2, 2) + Math.pow(button.height/2, 2));
 
-						if (dist < 5) {
+						if (dist < 2) {
 							closeJar = true;
 							break;
 						}
@@ -447,6 +460,8 @@ function getTileNameByTypeId(id) {
 			return 'tile-grass-pipe-horizontal-narrow';
 		case 17:
 			return 'tile-grass-pipe-vertical-narrow';
+		case 18:
+			return 'tile-spikes';
 	}
 }
 
