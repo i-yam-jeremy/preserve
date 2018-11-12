@@ -7,12 +7,13 @@ class LevelScene extends Phaser.Scene {
 	constructor(levelData) {
 		super(levelData.name);
 		this.levelData = levelData;
+		this.jamletsFinished = 0;
 	}
 
 	preload() {
 		this.load.image('background-tile', 'assets/background-tile.png');
 		this.load.image('jar', 'assets/jar.png');
-		this.load.image('jam-ball', 'assets/jam-ball.png');
+		this.load.image('jamlet', 'assets/jamlet.png');
 		this.load.image('tile-grass-top-middle', 'assets/tile-grass-top-middle.png');
 		this.load.image('tile-grass-top-left', 'assets/tile-grass-top-left.png');
 		this.load.image('tile-grass-top-right', 'assets/tile-grass-top-right.png');
@@ -27,6 +28,7 @@ class LevelScene extends Phaser.Scene {
 		this.load.image('tile-button-up', 'assets/tile-button-up.png');
 		this.load.image('tile-button-down', 'assets/tile-button-down.png');
 		this.load.image('tile-gate', 'assets/tile-gate.png');
+		this.load.image('tile-finish', 'assets/tile-finish.png');
 
 		this.load.audio('gate', ['assets/gate.mp3']);
 
@@ -34,6 +36,7 @@ class LevelScene extends Phaser.Scene {
 	}
 
 	create() {
+
 		this.cursors = this.input.keyboard.createCursorKeys();
 
 
@@ -46,25 +49,43 @@ class LevelScene extends Phaser.Scene {
 			for (let i = 0; i < e.pairs.length; i++) {
 				let bodyA = getRootBody(e.pairs[i].bodyA);
 				let bodyB = getRootBody(e.pairs[i].bodyB);
-		
+	
+				let bodyLabels = [bodyA.label, bodyB.label];
+				
+				if (bodyLabels.indexOf('jamlet') != -1 && bodyLabels.indexOf('tile-finish') != -1) {
+					let jamletBody = bodyA.label == 'jamlet' ? bodyA : bodyB;
+					let index = this.liquidBalls.indexOf(jamletBody.gameObject);
+					this.liquidBalls.splice(index, 1);
+					jamletBody.gameObject.destroy();
+					this.jamletsFinished++;
+					this.jamletsLabel.setText("Jamlets: " + this.jamletsFinished + "/" + this.levelData.jamletsNeeded)
+
+					if (this.jamletsFinished >= this.levelData.jamletsNeeded) {
+						// TODO finish level
+						alert('You finished');
+					}
+				}
+	
 				if (this.jars) {
 					for (let jar of this.jars) {
 						if (jar.sprite.body == bodyA || jar.sprite.body == bodyB) {
 							jar.onGround = true;
 							let body = jar.sprite.body == bodyA ? bodyB : bodyA;
 							if (body.label == 'tile-button-up') {
-								let tileName = 'tile-button-down';
-								let tile = this.matter.add.sprite(0, 0, tileName, '', {shape: this.shapes[tileName]});
-								tile.setPosition(body.gameObject.x, body.gameObject.y - body.gameObject.centerOfMass.y + tile.centerOfMass.y);
+								if (jar.sprite.y + jar.sprite.centerOfMass.y - 3 < body.gameObject.y) {
+									let tileName = 'tile-button-down';
+									let tile = this.matter.add.sprite(0, 0, tileName, '', {shape: this.shapes[tileName]});
+									tile.setPosition(body.gameObject.x, body.gameObject.y - body.gameObject.centerOfMass.y + tile.centerOfMass.y);
+									
+									let tileX = (body.gameObject.x - body.gameObject.centerOfMass.x) / TILE_WIDTH;
+									let tileY = (body.gameObject.y - body.gameObject.centerOfMass.y) / TILE_WIDTH;
+									body.gameObject.destroy();
+									
+									let gateSound = this.sound.add('gate');
+									gateSound.play();
 								
-								let tileX = (body.gameObject.x - body.gameObject.centerOfMass.x) / TILE_WIDTH;
-								let tileY = (body.gameObject.y - body.gameObject.centerOfMass.y) / TILE_WIDTH;
-								body.gameObject.destroy();
-								
-								let gateSound = this.sound.add('gate');
-								gateSound.play();
-							
-								this.levelData.buttonHandler(this, tileX, tileY, 'down');
+									this.levelData.buttonHandler(this, tileX, tileY, 'down');
+								}
 							}
 						}
 					}
@@ -83,16 +104,18 @@ class LevelScene extends Phaser.Scene {
 							jar.onGround = false;
 							let body = jar.sprite.body == bodyA ? bodyB : bodyA;
 							if (body.label == 'tile-button-down') {
-								let tileName = 'tile-button-up';
-								let tile = this.matter.add.sprite(0, 0, tileName, '', {shape: this.shapes[tileName]});
-								tile.setPosition(body.gameObject.x, body.gameObject.y - body.gameObject.centerOfMass.y + tile.centerOfMass.y);
-								let tileX = (body.gameObject.x - body.gameObject.centerOfMass.x) / TILE_WIDTH;
-								let tileY = (body.gameObject.y - body.gameObject.centerOfMass.y) / TILE_WIDTH;
-								body.gameObject.destroy();
+								if (jar.sprite.y + jar.sprite.centerOfMass.y - 3 < body.gameObject.y) {
+									let tileName = 'tile-button-up';
+									let tile = this.matter.add.sprite(0, 0, tileName, '', {shape: this.shapes[tileName]});
+									tile.setPosition(body.gameObject.x, body.gameObject.y - body.gameObject.centerOfMass.y + tile.centerOfMass.y);
+									let tileX = (body.gameObject.x - body.gameObject.centerOfMass.x) / TILE_WIDTH;
+									let tileY = (body.gameObject.y - body.gameObject.centerOfMass.y) / TILE_WIDTH;
+									body.gameObject.destroy();
 
-								let gateSound = this.sound.add('gate');
-								gateSound.play();
-								this.levelData.buttonHandler(this, tileX, tileY, 'up');
+									let gateSound = this.sound.add('gate');
+									gateSound.play();
+									this.levelData.buttonHandler(this, tileX, tileY, 'up');
+								}
 							}	
 						}
 					}
@@ -123,10 +146,20 @@ class LevelScene extends Phaser.Scene {
 		let jar = this.matter.add.sprite(0, 0, 'jar', '', {shape: this.shapes.jar});
 		jar.setPosition(400 + jar.centerOfMass.x, 200 + jar.centerOfMass.y);
 		this.jars = [{sprite: jar, balls: JAM_BALL_COUNT}];
+
+
+		this.jamletsLabel = this.add.text(0, 0, "Jamlets: " + this.jamletsFinished + "/" + this.levelData.jamletsNeeded, {
+			fontSize: '24px',
+			fontFamily: 'Courier',
+			color: '#FFC200',
+			backgroundColor: '#8899AA'
+		});
+		console.log(this.jamletsLabel);
 	}
 
 	update() {
 		this.centerCamera();
+		this.jamletsLabel.setPosition(this.cameras.main.scrollX, this.cameras.main.scrollY);
 
 		if (this.jars) {
 			for (let jar of this.jars) {
@@ -175,11 +208,10 @@ class LevelScene extends Phaser.Scene {
 
 	toggleLiquify() {
 		if (this.jars) {
-			console.log(this.jars[0].sprite.body.velocity);
 			this.liquidBalls = [];
 			for (let jar of this.jars) {
 				for (let i = 0; i < jar.balls; i++) {
-					let ball = this.matter.add.sprite(0, 0, 'jam-ball', '', {shape: this.shapes['jam-ball']});
+					let ball = this.matter.add.sprite(0, 0, 'jamlet', '', {shape: this.shapes['jamlet']});
 					ball.setPosition(jar.sprite.x + ball.centerOfMass.x, jar.sprite.y + ball.centerOfMass.y);
 					ball.setVelocity(
 						jar.sprite.body.velocity.x + LIQUIFY_SPEED*(2*Math.random() - 1),
@@ -301,6 +333,8 @@ function getTileNameByTypeId(id) {
 			return 'tile-button-up';
 		case 12:
 			return 'tile-gate';
+		case 13:
+			return 'tile-finish';
 	}
 }
 

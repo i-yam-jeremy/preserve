@@ -144,32 +144,6 @@
 			}
 		]
 	},
-	"jam-ball": {
-		"type": "fromPhysicsEditor",
-		"label": "jam-ball",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.1,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": -1,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": [
-			{
-				"label": "",
-				"isSensor": false,
-				"circle": {
-					"x": 8,
-					"y": 7.799999999999999,
-					"radius": 7.863841300534997
-				}
-			}
-		]
-	},
 	"tile-grass-slope-right-start": {
 		"type": "fromPhysicsEditor",
 		"label": "tile-grass-slope-right-start",
@@ -318,7 +292,7 @@
 		"type": "fromPhysicsEditor",
 		"label": "tile-button-down",
 		"isStatic": true,
-		"density": 0.10000000149011612,
+		"density": 0.1,
 		"restitution": 0,
 		"friction": 0.10000000149011612,
 		"frictionAir": 0.009999999776482582,
@@ -342,7 +316,7 @@
 		"type": "fromPhysicsEditor",
 		"label": "tile-button-up",
 		"isStatic": true,
-		"density": 0.10000000149011612,
+		"density": 0.1,
 		"restitution": 0,
 		"friction": 0.10000000149011612,
 		"frictionAir": 0.009999999776482582,
@@ -383,6 +357,58 @@
 				"vertices": [
 					[ { "x":13, "y":1 }, { "x":13, "y":63 }, { "x":53, "y":63 }, { "x":53, "y":1 } ]
 				]
+			}
+		]
+	},
+	"tile-finish": {
+		"type": "fromPhysicsEditor",
+		"label": "tile-finish",
+		"isStatic": true,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"circle": {
+					"x": 32,
+					"y": 31.799999999999997,
+					"radius": 31.031596800680433
+				}
+			}
+		]
+	},
+	"jamlet": {
+		"type": "fromPhysicsEditor",
+		"label": "jamlet",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"circle": {
+					"x": 8,
+					"y": 7.799999999999999,
+					"radius": 7.200000000000003
+				}
 			}
 		]
 	}
