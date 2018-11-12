@@ -5,7 +5,7 @@ import {TILE_WIDTH, JAM_BALL_COUNT, LIQUIFY_SPEED, LEVEL_COUNT} from '../constan
 class LevelScene extends Phaser.Scene {
 
 	constructor(levelMode, level, levelData, levelsUnlocked) {
-		super(levelData.name);
+		super('level');
 		this.levelData = levelData;
 		this.jamletsFinished = 0;
 		this.levelMode = levelMode;
@@ -66,6 +66,7 @@ class LevelScene extends Phaser.Scene {
 					if (this.jamletsFinished >= this.levelData.jamletsNeeded) {
 						this.unlockNextLevel();
 						this.scene.switch('level-select');
+						this.scene.remove('level');
 					}
 				}
 	
@@ -162,7 +163,11 @@ class LevelScene extends Phaser.Scene {
 		this.backButton.setPosition(this.backButton.width/2, this.cameras.main.displayHeight - this.backButton.height/2);
 
 		this.input.on('pointermove', (p) => {
-			if (contains(p, this.backButton)) {
+			let adjustedP = { // point adjusted for camera scroll
+				x: p.x + this.cameras.main.scrollX,
+				y: p.y + this.cameras.main.scrollY
+			};
+			if (contains(adjustedP, this.backButton)) {
 				this.backButton.setTint(0xAAAAAA);	
 			}
 			else {
@@ -171,9 +176,14 @@ class LevelScene extends Phaser.Scene {
 		}, this);
 		
 		this.input.on('pointerdown', (p) => {
-			if (contains(p, this.backButton)) {
+			let adjustedP = { // point adjusted for camera scroll
+				x: p.x + this.cameras.main.scrollX,
+				y: p.y + this.cameras.main.scrollY
+			};
+			if (contains(adjustedP, this.backButton)) {
 				this.backButton.setTint(0xFFFFFF);
 				this.scene.switch('level-select');
+				this.scene.remove('level');
 			}
 		}, this);
 	}

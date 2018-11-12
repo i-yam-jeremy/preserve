@@ -1,6 +1,9 @@
 import 'phaser';
 
+import {LevelScene} from './level';
+
 import {LEVEL_COUNT} from '../constants/constants';
+import {LEVEL_DATA} from '../levels/levels';
 
 const LEVELS_PER_ROW = 4;
 
@@ -127,7 +130,10 @@ class LevelSelectScene extends Phaser.Scene {
 				if (contains(p, levelIcon)) {
 					if (this.levelsUnlocked[this.levelMode][i]) {
 						levelIcon.setTint(0xFFFFFF);
-						this.scene.switch('level-' + level);
+						let newLevelData = Object.assign({}, LEVEL_DATA[i]);
+						newLevelData.jamletsNeeded = newLevelData.jamletsNeeded[this.levelMode]; // get jamlets for this specific mode
+						this.scene.add('', new LevelScene(this.levelMode, level, newLevelData, this.levelsUnlocked));
+						this.scene.switch('level');
 					}
 				}
 			}
