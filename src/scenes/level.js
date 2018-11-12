@@ -148,7 +148,7 @@ class LevelScene extends Phaser.Scene {
 		}
 		
 		let jar = this.matter.add.sprite(0, 0, 'jar', '', {shape: this.shapes.jar});
-		jar.setPosition(400 + jar.centerOfMass.x, 200 + jar.centerOfMass.y);
+		jar.setPosition(0 + jar.centerOfMass.x, TILE_WIDTH*this.levelData.height - jar.centerOfMass.y);
 		this.jars = [{sprite: jar, balls: JAM_BALL_COUNT}];
 
 
