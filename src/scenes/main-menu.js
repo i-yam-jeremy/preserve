@@ -56,7 +56,7 @@ class MainMenuScene extends Phaser.Scene {
 			    p.y < levelsButton.y + levelsButton.height/2) {
 
 				levelsButton.play('button-levels-down');
-				this.scene.switch('level-1');
+				this.scene.switch('level-select');
 			}
 			else if (p.x > howToButton.x - howToButton.width/2 &&
 			    p.x < howToButton.x + howToButton.width/2 &&
@@ -64,6 +64,7 @@ class MainMenuScene extends Phaser.Scene {
 			    p.y < howToButton.y + howToButton.height/2) {
 
 				howToButton.play('button-how-to-down');
+				this.scene.switch('how-to');
 			}
 		}, this);
 		
