@@ -34,8 +34,6 @@ class LevelScene extends Phaser.Scene {
 		this.load.image('tile-finish', 'assets/tile-finish.png');
 		this.load.image('back-to-level-select', 'assets/back-to-level-select.png');
 
-		this.load.audio('gate', ['assets/gate.mp3']);
-
 		this.load.json('shapes', 'assets/shapes.json');
 	}
 
@@ -74,28 +72,40 @@ class LevelScene extends Phaser.Scene {
 					for (let jar of this.jars) {
 						if (jar.sprite.body == bodyA || jar.sprite.body == bodyB) {
 							jar.onGround = true;
-							let body = jar.sprite.body == bodyA ? bodyB : bodyA;
-							if (body.label == 'tile-button-up') {
-								if (jar.sprite.y + jar.sprite.centerOfMass.y - 3 < body.gameObject.y) {
-									let tileName = 'tile-button-down';
-									let tile = this.matter.add.sprite(0, 0, tileName, '', {shape: this.shapes[tileName]});
-									tile.setPosition(body.gameObject.x, body.gameObject.y - body.gameObject.centerOfMass.y + tile.centerOfMass.y);
-									
-									let tileX = (body.gameObject.x - body.gameObject.centerOfMass.x) / TILE_WIDTH;
-									let tileY = (body.gameObject.y - body.gameObject.centerOfMass.y) / TILE_WIDTH;
-									body.gameObject.destroy();
-									
-									let gateSound = this.sound.add('gate');
-									gateSound.play();
-								
-									this.levelData.buttonHandler(this, tileX, tileY, 'down');
-								}
-							}
 						}
 					}
 				}
 			}
 		});
+
+		setInterval(() => {
+			if (this.jars) {
+				for (let button of this.buttons) {
+					let closeJar = false;
+					for (let jar of this.jars) {
+						let dist = Math.sqrt(Math.pow(jar.sprite.x - button.x, 2) + Math.pow(jar.sprite.y - button.y, 2));
+						dist -= Math.sqrt(Math.pow(jar.sprite.width/2, 2) + Math.pow(jar.sprite.height/2, 2));
+						dist -= Math.sqrt(Math.pow(button.width/2, 2) + Math.pow(button.height/2, 2));
+
+						if (dist < 5) {
+							closeJar = true;
+							break;
+						}
+					}
+					if (closeJar) {
+						this.pressButton(button);
+					}
+					else {
+						this.releaseButton(button);	
+					}
+				}
+			}
+			else {
+				for (let button of this.buttons) {
+					this.releaseButton(button);
+				}
+			}
+		}, 500);
 		
 		this.matter.world.on('collisionend', (e) => {
 			for (let i = 0; i < e.pairs.length; i++) {
@@ -106,21 +116,6 @@ class LevelScene extends Phaser.Scene {
 					for (let jar of this.jars) {
 						if (jar.sprite.body == bodyA || jar.sprite.body == bodyB) {
 							jar.onGround = false;
-							let body = jar.sprite.body == bodyA ? bodyB : bodyA;
-							if (body.label == 'tile-button-down') {
-								if (jar.sprite.y + jar.sprite.centerOfMass.y - 3 < body.gameObject.y) {
-									let tileName = 'tile-button-up';
-									let tile = this.matter.add.sprite(0, 0, tileName, '', {shape: this.shapes[tileName]});
-									tile.setPosition(body.gameObject.x, body.gameObject.y - body.gameObject.centerOfMass.y + tile.centerOfMass.y);
-									let tileX = (body.gameObject.x - body.gameObject.centerOfMass.x) / TILE_WIDTH;
-									let tileY = (body.gameObject.y - body.gameObject.centerOfMass.y) / TILE_WIDTH;
-									body.gameObject.destroy();
-
-									let gateSound = this.sound.add('gate');
-									gateSound.play();
-									this.levelData.buttonHandler(this, tileX, tileY, 'up');
-								}
-							}	
 						}
 					}
 				}
@@ -131,6 +126,7 @@ class LevelScene extends Phaser.Scene {
 		this.input.keyboard.on('keydown_SPACE', this.toggleLiquify.bind(this), this);
 
 		this.gates = [];
+		this.buttons = [];
 		for (let y = 0; y < this.levelData.height; y++) {
 			for (let x = 0; x < this.levelData.width; x++) {
 				this.add.image(x*TILE_WIDTH, y*TILE_WIDTH, 'background-tile').setOrigin(0, 0);
@@ -142,6 +138,10 @@ class LevelScene extends Phaser.Scene {
 				
 					if (tileName == 'tile-gate') {
 						this.gates.push({x: x, y: y, sprite: tile});
+					}
+			
+					if (tileName == 'tile-button-up') {
+						this.buttons.push(tile);
 					}
 				}
 			}
@@ -342,6 +342,39 @@ class LevelScene extends Phaser.Scene {
 			this.levelsUnlocked[this.levelMode][index+1] = true;
 		}
 		this.levelsUnlocked.needsToRefreshLocks = true;
+	}
+
+	releaseButton(button) {
+		let tileName = 'tile-button-up';
+		let tile = this.matter.add.sprite(0, 0, tileName, '', {shape: this.shapes[tileName]});
+		tile.setPosition(button.x, button.y - button.centerOfMass.y + tile.centerOfMass.y);
+		let tileX = (button.x - button.centerOfMass.x) / TILE_WIDTH;
+		let tileY = (button.y - button.centerOfMass.y) / TILE_WIDTH;
+
+		let index = this.buttons.indexOf(button);
+
+		button.destroy();
+
+		this.buttons[index] = tile; // insert new button and remove old one
+
+		this.levelData.buttonHandler(this, tileX, tileY, 'up');
+	}
+
+	pressButton(button) {
+		let tileName = 'tile-button-down';
+		let tile = this.matter.add.sprite(0, 0, tileName, '', {shape: this.shapes[tileName]});
+		tile.setPosition(button.x, button.y - button.centerOfMass.y + tile.centerOfMass.y);
+		
+		let tileX = (button.x - button.centerOfMass.x) / TILE_WIDTH;
+		let tileY = (button.y - button.centerOfMass.y) / TILE_WIDTH;
+		
+		let index = this.buttons.indexOf(button);
+
+		button.destroy();
+	
+		this.buttons[index] = tile; // insert new button and remove old one
+
+		this.levelData.buttonHandler(this, tileX, tileY, 'down');
 	}
 
 }
