@@ -1,6 +1,7 @@
 import 'phaser';
 
-const LEVEL_COUNT = 16;
+import {LEVEL_COUNT} from '../constants/constants';
+
 const LEVELS_PER_ROW = 4;
 
 const MODES = ['easy', 'medium', 'hard'];
@@ -38,6 +39,7 @@ class LevelSelectScene extends Phaser.Scene {
 	constructor(levelsUnlocked) {
 		super('level-select');
 		this.levelMode = 'easy';
+		this.levelsUnlocked = levelsUnlocked;
 	}
 
 	preload() {
@@ -48,6 +50,7 @@ class LevelSelectScene extends Phaser.Scene {
 		this.load.image('medium', 'assets/level-select-medium.png');
 		this.load.image('hard', 'assets/level-select-hard.png');
 		this.load.image('back', 'assets/level-select-back.png');
+		this.load.image('lock-icon', 'assets/level-select-locked.png');
 		for (let level = 1; level <= LEVEL_COUNT; level++) {
 			this.load.image('level-icon-' + level, 'assets/level-icon-' + level + '.png');
 		}
@@ -58,11 +61,12 @@ class LevelSelectScene extends Phaser.Scene {
 
 		let backButton = this.add.image(416, 605, 'back');
 
-		let modeLabel = this.add.image(416, 160, this.levelMode);
+		this.modeLabel = this.add.image(416, 160, this.levelMode);
 		let leftModeArrow = this.add.image(346, 160, 'arrow-left');
 		let rightModeArrow = this.add.image(486, 160, 'arrow-right');	
 
-		let levelIcons = [];
+		this.levelIcons = [];
+		this.lockIcons = [];
 		for (let level = 1; level <= LEVEL_COUNT; level++) {
 			let i = level-1;
 			let gridX = i % LEVELS_PER_ROW;
@@ -73,18 +77,25 @@ class LevelSelectScene extends Phaser.Scene {
 
 
 			let levelIcon = this.add.image(pixelX, pixelY, 'level-icon-' + level);
-			levelIcons.push(levelIcon);
+			this.levelIcons.push(levelIcon);
 		}
 
+		this.changeMode(this.levelMode); // just used to put locks on level icons (the levelMode hasn't changed)
+
 		this.input.on('pointermove', (p) => {
-			for (let i = 0; i < levelIcons.length; i++) {
+			for (let i = 0; i < this.levelIcons.length; i++) {
 				let level = i+1;
-				let levelIcon = levelIcons[i];
+				let levelIcon = this.levelIcons[i];
 				if (contains(p, levelIcon)) {
 					levelIcon.setTint(0xAAAAAA);
 				}
 				else {
-					levelIcon.setTint(0xFFFFFF);
+					if (this.levelsUnlocked[this.levelMode][i]) {
+						levelIcon.setTint(0xFFFFFF);
+					}
+					else {
+						levelIcon.setTint(0xCCCCCC);
+					}
 				}
 			}
 
@@ -111,11 +122,11 @@ class LevelSelectScene extends Phaser.Scene {
 		});
 		
 		this.input.on('pointerdown', (p) => {
-			for (let i = 0; i < levelIcons.length; i++) {
+			for (let i = 0; i < this.levelIcons.length; i++) {
 				let level = i+1;
-				let levelIcon = levelIcons[i];
+				let levelIcon = this.levelIcons[i];
 				if (contains(p, levelIcon)) {
-					if (this.levelsUnlocked[this.mode][level]) {
+					if (this.levelsUnlocked[this.levelMode][i]) {
 						levelIcon.setTint(0xFFFFFF);
 						this.scene.switch('level-' + level);
 					}
@@ -128,17 +139,35 @@ class LevelSelectScene extends Phaser.Scene {
 			}
 			
 			if (contains(p, leftModeArrow)) {
-				this.levelMode = getPrevMode(this.levelMode);
-				modeLabel.destroy();
-				modeLabel = this.add.image(416, 160, this.levelMode);
+				let newMode = getPrevMode(this.levelMode);
+				this.changeMode(newMode);
 			}
 			else if (contains(p, rightModeArrow)) {
-				this.levelMode = getNextMode(this.levelMode);
-				modeLabel.destroy();
-				modeLabel = this.add.image(416, 160, this.levelMode);	
+				let newMode = getNextMode(this.levelMode);
+				this.changeMode(newMode);
 			}
 		});
 
+	}
+
+	changeMode(newMode) {
+		this.levelMode = newMode;
+		this.modeLabel.destroy();
+		this.modeLabel = this.add.image(416, 160, this.levelMode);
+	
+		this.lockIcons.map(lockIcon => lockIcon.destroy());
+		for (let i = 0; i < this.levelIcons.length; i++) {
+			let level = i+1;
+			let levelIcon = this.levelIcons[i];
+			if (!this.levelsUnlocked[this.levelMode][i]) {
+				levelIcon.setTint(0xCCCCCC);
+				let lockIcon = this.add.image(levelIcon.x, levelIcon.y, 'lock-icon');
+				this.lockIcons.push(lockIcon);
+			}
+			else {
+				levelIcon.setTint(0xFFFFFF);
+			}
+		}
 	}
 
 }
