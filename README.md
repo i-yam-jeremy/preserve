@@ -1,4 +1,7 @@
 # Preserve
+
+[Play Preserve!](https://i-yam-jeremy.github.io/preserve)
+
 Preserve is a game I made for the 48-hour CPGD Game Jam. I have made some minor bug fixes and updates since then to polish off the game, however there are also links to the 48-hour Game Jam [release](https://github.com/i-yam-jeremy/preserve/releases/tag/v1.0) and [demo](https://i-yam-jeremy.itch.io/preserve).
 
 ## Game Concept
