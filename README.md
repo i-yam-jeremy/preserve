@@ -11,22 +11,21 @@ Preserve is a 2D puzzle platformer. You play as a jar of jam and you can liquify
 
 ### Movement
 Move with the arrow keys. Left and right to move sideways. Up to jump. If you are against a wall you can multiple jump up the wall.
-
 ![Movement GIF](readme-assets/movement.gif)
 
 ### Liquifying & De-liquifying
-TODO
+Press <space> to liquify or de-liquify. If in jar mode you will transform into jam droplets (jamlets) which have no movement controls and only are affected by gravity and momentum. However, jamlets are smaller and can fit through smaller spaces. When converting back into jar mode, if jamlets are not touching, they will form separate jars. Jamlets are divided into clumps and converted to jars corresponding to the size of each clump.
 ![Liquify GIF](readme-assets/liquify.gif)
 
 ### Finish Block
-TODO
+The goal of the game is to get your jamlets to the finish block. You must be in liquid form for the jamlets to be counted when touching the finish.
 ![Finish GIF](readme-assets/finish.gif)
 
 ### Buttons & Gates
-TODO
+Buttons can open gates. To press a button you must be touching it when in jar form. The button will open its attached gate. When you step off a button, the gate will close.
 ![Button Gate GIF](readme-assets/button-gate.gif)
 
 ### Spikes
-TODO
+Spikes will kill your jamlets. Your jars are protected, however if you convert to liquid form any jamlets touching spikes will die and you will lose them. This will make the level more difficult or even impossible depending on how many jamlets die. If you lose all your jamlets, you will go back to the level select menu.
 ![Spikes GIF](readme-assets/spikes.gif)
 
