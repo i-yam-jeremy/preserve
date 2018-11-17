@@ -12,17 +12,21 @@ Preserve is a 2D puzzle platformer. You play as a jar of jam and you can liquify
 ### Movement
 Move with the arrow keys. Left and right to move sideways. Up to jump. If you are against a wall you can multiple jump up the wall.
 
-TODO add images / gifs
+![Movement GIF](readme-assets/movement.gif)
 
 ### Liquifying & De-liquifying
 TODO
+![Liquify GIF](readme-assets/liquify.gif)
 
 ### Finish Block
 TODO
+![Finish GIF](readme-assets/finish.gif)
 
 ### Buttons & Gates
 TODO
+![Button Gate GIF](readme-assets/button-gate.gif)
 
 ### Spikes
 TODO
+![Spikes GIF](readme-assets/spikes.gif)
 
