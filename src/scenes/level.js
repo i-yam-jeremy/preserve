@@ -41,12 +41,12 @@ class LevelScene extends Phaser.Scene {
 
 		this.load.json('shapes', 'assets/shapes.json');
 
-		this.load.audio('jam-slurp', ['assets/audio/jam-slurp.m4a']);
-		this.load.audio('jar-break', ['assets/audio/jar-break.m4a']);
-		this.load.audio('finish-sound', ['assets/audio/finish-sound.m4a']);
-		this.load.audio('jamlet-scream', ['assets/audio/jamlet-scream.m4a']);
-		this.load.audio('gate-open', ['assets/audio/gate-open.m4a']);
-		this.load.audio('gate-close', ['assets/audio/gate-close.m4a']);
+		this.load.audio('jam-slurp', ['assets/audio/jam-slurp.mp3', 'assets/audio/jam-slurp.m4a']);
+		this.load.audio('jar-break', ['assets/audio/jar-break.mp3', 'assets/audio/jar-break.m4a']);
+		this.load.audio('finish-sound', ['assets/audio/finish-sound.mp3', 'assets/audio/finish-sound.m4a']);
+		this.load.audio('jamlet-scream', ['assets/audio/jamlet-scream.mp3', 'assets/audio/jamlet-scream.m4a']);
+		this.load.audio('gate-open', ['assets/audio/gate-open.mp3', 'assets/audio/gate-open.m4a']);
+		this.load.audio('gate-close', ['assets/audio/gate-close.mp3', 'assets/audio/gate-close.m4a']);
 	}
 
 	create() {
