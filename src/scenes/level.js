@@ -54,6 +54,7 @@ class LevelScene extends Phaser.Scene {
 		this.cursors = this.input.keyboard.createCursorKeys();
 
 		this.jamSlurpSound = this.sound.add('jam-slurp');
+		this.jarBreakSound = this.sound.add('jar-break');
 		let finishSound = this.sound.add('finish-sound');
 		let jamletScream = this.sound.add('jamlet-scream');
 		let gateOpenSound = this.sound.add('gate-open');
@@ -279,6 +280,7 @@ class LevelScene extends Phaser.Scene {
 
 	toggleLiquify() {
 		if (this.jars) {
+			this.jarBreakSound.play();
 			this.liquidBalls = [];
 			for (let jar of this.jars) {
 				for (let i = 0; i < jar.balls; i++) {
