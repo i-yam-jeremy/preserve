@@ -11,9 +11,13 @@ class MainMenuScene extends Phaser.Scene {
 		this.load.image('title', 'assets/title.png');
 		this.load.spritesheet('button-levels', 'assets/button-levels.png', { frameWidth: 160, frameHeight: 80 });
 		this.load.spritesheet('button-how-to', 'assets/button-how-to.png', { frameWidth: 160, frameHeight: 80 });
+		this.load.audio('preserve-theme', ['assets/audio/preserve-theme.m4a']);
 	}
 
 	create() {
+		let themeMusic = this.sound.add('preserve-theme');
+		themeMusic.play({loop: true});
+
 		this.add.image(0, 0, 'menu-background').setOrigin(0, 0);
 		let levelsButton = this.add.sprite(416, 360, 'button-levels');
 		let howToButton = this.add.sprite(416, 480, 'button-how-to');
