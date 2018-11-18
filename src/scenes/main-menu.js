@@ -16,7 +16,7 @@ class MainMenuScene extends Phaser.Scene {
 
 	create() {
 		let themeMusic = this.sound.add('preserve-theme');
-		themeMusic.play({loop: true});
+		//themeMusic.play({loop: true});
 
 		this.add.image(0, 0, 'menu-background').setOrigin(0, 0);
 		let levelsButton = this.add.sprite(416, 360, 'button-levels');

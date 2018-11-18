@@ -19,7 +19,7 @@ class Game extends Phaser.Game {
 		document.getElementById('game-container').appendChild(this.canvas);
 
 		let levelsUnlocked = {
-			'easy': Array.apply(null, Array(LEVEL_COUNT)).map(x => false),
+			'easy': Array.apply(null, Array(LEVEL_COUNT)).map(x => true),
 			'medium': Array.apply(null, Array(LEVEL_COUNT)).map(x => false),
 			'hard': Array.apply(null, Array(LEVEL_COUNT)).map(x => false),
 			needsToRefreshLocks: false
