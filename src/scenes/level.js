@@ -40,12 +40,25 @@ class LevelScene extends Phaser.Scene {
 		this.load.image('back-to-level-select', 'assets/back-to-level-select.png');
 
 		this.load.json('shapes', 'assets/shapes.json');
+
+		this.load.audio('jam-slurp', ['assets/audio/jam-slurp.mp3', 'assets/audio/jam-slurp.m4a']);
+		this.load.audio('jar-break', ['assets/audio/jar-break.mp3', 'assets/audio/jar-break.m4a']);
+		this.load.audio('finish-sound', ['assets/audio/finish-sound.mp3', 'assets/audio/finish-sound.m4a']);
+		this.load.audio('jamlet-scream', ['assets/audio/jamlet-scream.mp3', 'assets/audio/jamlet-scream.m4a']);
+		this.load.audio('gate-open', ['assets/audio/gate-open.mp3', 'assets/audio/gate-open.m4a']);
+		this.load.audio('gate-close', ['assets/audio/gate-close.mp3', 'assets/audio/gate-close.m4a']);
 	}
 
 	create() {
 
 		this.cursors = this.input.keyboard.createCursorKeys();
 
+		this.jamSlurpSound = this.sound.add('jam-slurp');
+		this.jarBreakSound = this.sound.add('jar-break');
+		let finishSound = this.sound.add('finish-sound');
+		let jamletScream = this.sound.add('jamlet-scream');
+		let gateOpenSound = this.sound.add('gate-open');
+		let gateCloseSound = this.sound.add('gate-close');
 
 		this.shapes = this.cache.json.get('shapes');
 		this.cameras.main.setBounds(0, 0, TILE_WIDTH*this.levelData.width, TILE_WIDTH*this.levelData.height);
@@ -64,6 +77,7 @@ class LevelScene extends Phaser.Scene {
 					this.liquidBalls.splice(index, 1);
 					jamletBody.gameObject.destroy();
 					this.jamletsFinished++;
+					finishSound.play();
 					this.jamletsLabel.setText("Jamlets: " + this.jamletsFinished + "/" + this.levelData.jamletsNeeded)
 
 					if (this.jamletsFinished >= this.levelData.jamletsNeeded) {
@@ -76,6 +90,7 @@ class LevelScene extends Phaser.Scene {
 					let index = this.liquidBalls.indexOf(jamletBody.gameObject);
 					this.liquidBalls.splice(index, 1);
 					jamletBody.gameObject.destroy();
+					jamletScream.play();
 
 					if (this.liquidBalls.length == 0) {
 						this.scene.switch('level-select');
@@ -98,9 +113,9 @@ class LevelScene extends Phaser.Scene {
 				for (let button of this.buttons) {
 					let closeJar = false;
 					for (let jar of this.jars) {
-						let dist = Math.sqrt(Math.pow(jar.sprite.x - button.x, 2) + Math.pow(jar.sprite.y - button.y, 2));
+						let dist = Math.sqrt(Math.pow(jar.sprite.x - button.sprite.x, 2) + Math.pow(jar.sprite.y - button.sprite.y, 2));
 						dist -= Math.sqrt(Math.pow(jar.sprite.width/2, 2) + Math.pow(jar.sprite.height/2, 2));
-						dist -= Math.sqrt(Math.pow(button.width/2, 2) + Math.pow(button.height/2, 2));
+						dist -= Math.sqrt(Math.pow(button.sprite.width/2, 2) + Math.pow(button.sprite.height/2, 2));
 
 						if (dist < 1) {
 							closeJar = true;
@@ -108,16 +123,25 @@ class LevelScene extends Phaser.Scene {
 						}
 					}
 					if (closeJar) {
-						this.pressButton(button);
+						if (!button.pressed) {
+							gateOpenSound.play();
+							this.pressButton(button);
+						}
 					}
 					else {
-						this.releaseButton(button);	
+						if (button.pressed) {
+							gateCloseSound.play();
+							this.releaseButton(button);
+						}
 					}
 				}
 			}
 			else {
 				for (let button of this.buttons) {
-					this.releaseButton(button);
+					if (button.pressed) {
+						gateCloseSound.play();
+						this.releaseButton(button);
+					}
 				}
 			}
 		}, 500);
@@ -156,7 +180,7 @@ class LevelScene extends Phaser.Scene {
 					}
 			
 					if (tileName == 'tile-button-up') {
-						this.buttons.push(tile);
+						this.buttons.push({sprite: tile, pressed: false});
 					}
 				}
 			}
@@ -256,6 +280,7 @@ class LevelScene extends Phaser.Scene {
 
 	toggleLiquify() {
 		if (this.jars) {
+			this.jarBreakSound.play();
 			this.liquidBalls = [];
 			for (let jar of this.jars) {
 				for (let i = 0; i < jar.balls; i++) {
@@ -272,6 +297,7 @@ class LevelScene extends Phaser.Scene {
 			this.jars = undefined;
 		}
 		else {
+			this.jamSlurpSound.play();
 			let clumps = [];
 			for (let ball of this.liquidBalls) {
 				let inClump = false;
@@ -365,15 +391,16 @@ class LevelScene extends Phaser.Scene {
 	releaseButton(button) {
 		let tileName = 'tile-button-up';
 		let tile = this.matter.add.sprite(0, 0, tileName, '', {shape: this.shapes[tileName]});
-		tile.setPosition(button.x, button.y - button.centerOfMass.y + tile.centerOfMass.y);
-		let tileX = (button.x - button.centerOfMass.x) / TILE_WIDTH;
-		let tileY = (button.y - button.centerOfMass.y) / TILE_WIDTH;
+		tile.setPosition(button.sprite.x, button.sprite.y - button.sprite.centerOfMass.y + tile.centerOfMass.y);
+		let tileX = (button.sprite.x - button.sprite.centerOfMass.x) / TILE_WIDTH;
+		let tileY = (button.sprite.y - button.sprite.centerOfMass.y) / TILE_WIDTH;
 
 		let index = this.buttons.indexOf(button);
 
-		button.destroy();
+		button.sprite.destroy();
 
-		this.buttons[index] = tile; // insert new button and remove old one
+		this.buttons[index].sprite = tile; // insert new button sprite and remove old one
+		this.buttons[index].pressed = false;
 
 		this.levelData.buttonHandler(this, tileX, tileY, 'up');
 	}
@@ -381,16 +408,17 @@ class LevelScene extends Phaser.Scene {
 	pressButton(button) {
 		let tileName = 'tile-button-down';
 		let tile = this.matter.add.sprite(0, 0, tileName, '', {shape: this.shapes[tileName]});
-		tile.setPosition(button.x, button.y - button.centerOfMass.y + tile.centerOfMass.y);
+		tile.setPosition(button.sprite.x, button.sprite.y - button.sprite.centerOfMass.y + tile.centerOfMass.y);
 		
-		let tileX = (button.x - button.centerOfMass.x) / TILE_WIDTH;
-		let tileY = (button.y - button.centerOfMass.y) / TILE_WIDTH;
+		let tileX = (button.sprite.x - button.sprite.centerOfMass.x) / TILE_WIDTH;
+		let tileY = (button.sprite.y - button.sprite.centerOfMass.y) / TILE_WIDTH;
 		
 		let index = this.buttons.indexOf(button);
 
-		button.destroy();
+		button.sprite.destroy();
 	
-		this.buttons[index] = tile; // insert new button and remove old one
+		this.buttons[index].sprite = tile; // insert new button button and remove old one
+		this.buttons[index].pressed = true;
 
 		this.levelData.buttonHandler(this, tileX, tileY, 'down');
 	}
