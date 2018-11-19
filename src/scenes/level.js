@@ -114,7 +114,7 @@ class LevelScene extends Phaser.Scene {
 					let closeJar = false;
 					for (let jar of this.jars) {
 						let dist = Math.sqrt(Math.pow(jar.sprite.x - button.sprite.x, 2) + Math.pow(jar.sprite.y - button.sprite.y, 2));
-						dist -= Math.sqrt(Math.pow(jar.sprite.width/2, 2) + Math.pow(jar.sprite.height/2, 2));
+						dist -= Math.sqrt(Math.pow(jar.sprite.width*jar.sprite.scaleX/2, 2) + Math.pow(jar.sprite.height*jar.sprite.scaleY/2, 2));
 						dist -= Math.sqrt(Math.pow(button.sprite.width/2, 2) + Math.pow(button.sprite.height/2, 2));
 
 						if (dist < 1) {
