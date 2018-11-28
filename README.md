@@ -7,6 +7,23 @@ Preserve is a game I made for the 48-hour CPGD Game Jam. I have made some minor 
 ## Game Concept
 Preserve is a 2D puzzle platformer. You play as a jar of jam and you can liquify your character to turn into liquid jam. If you jam droplets (jamlets) separate, you will form multiple jars when de-liquifying back into jar form. This can be useful so you can press buttons or fit thru spaces larger jars wouldn't be able to. The goal of the game is to preserve as many jamlets as possible by getting them to the finish. The main idea behind this game came from the phrase "Game Jam". I thought "huh? what if I made a game about jam". And the rest was history. Even the name Preserve is another jam-related pun.
 
+## Building from Source
+Clone or download this repository then
+```
+cd /path/to/preserve
+```
+then run
+```
+npm install
+```  
+to install the necessary dependencies  
+and finally,
+```
+npm start
+```
+to start the web server.  
+Preserve will now be available for you at `http://localhost:8000`
+
 ## Gameplay
 
 ### Movement
